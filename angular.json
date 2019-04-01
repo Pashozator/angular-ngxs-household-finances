@@ -136,5 +136,8 @@
       }
     }
   },
-  "defaultProject": "angular-ngxs-household-finances"
+  "defaultProject": "angular-ngxs-household-finances",
+  "cli": {
+    "packageManager": "yarn"
+  }
 }
