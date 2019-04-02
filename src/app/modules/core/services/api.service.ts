@@ -7,7 +7,9 @@ import { HttpClient } from '@angular/common/http';
 import { Budget } from '../../../types/budget';
 import { Operation } from '../../../types/operation';
 
-@Injectable()
+@Injectable({
+	providedIn: 'root'
+})
 export class ApiService {
 	private base: string;
 

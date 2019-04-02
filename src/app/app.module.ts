@@ -13,6 +13,8 @@ import { LoaderModule } from './modules/loader/loader.module';
 import { NgxsModule } from '@ngxs/store';
 import { NgxsReduxDevtoolsPluginModule } from '@ngxs/devtools-plugin';
 import { environment } from '../environments/environment';
+import { BudgetState } from './store/budget/budget.state';
+import { GoalsState } from './store/goals/goals.state';
 
 @NgModule({
 	declarations: [
@@ -28,7 +30,10 @@ import { environment } from '../environments/environment';
 		CoreModule,
 		ErrorModule,
 		LoaderModule,
-		NgxsModule.forRoot([]),
+		NgxsModule.forRoot([
+			BudgetState,
+			GoalsState
+		]),
 		NgxsReduxDevtoolsPluginModule.forRoot({
 			name: 'HouseholdFinances',
 			disabled: environment.production

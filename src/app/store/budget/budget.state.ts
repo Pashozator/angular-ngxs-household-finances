@@ -15,6 +15,10 @@ import {
 	RemoveOperationFailureAction,
 	RemoveOperationSuccessAction
 } from './budget.actions';
+import { ApiService } from '../../modules/core/services/api.service';
+import { produce } from '@ngxs-labs/immer-adapter';
+import { ErrorService } from '../../modules/error/services/error.service';
+import { LoaderService } from '../../modules/loader/services/loader.service';
 
 export interface BudgetStateModel {
 	operations: Operation[];
@@ -29,6 +33,13 @@ export interface BudgetStateModel {
 	}
 })
 export class BudgetState {
+	constructor(
+		private api: ApiService,
+		private error: ErrorService,
+		private loader: LoaderService
+	) {
+	}
+
 	@Selector()
 	public static getOperations(state: BudgetStateModel) {
 		return state.operations;
@@ -41,105 +52,144 @@ export class BudgetState {
 
 	@Action(GetBudgetAction)
 	public async getBudgetAction(
-		ctx: StateContext<BudgetStateModel>,
-		action: GetBudgetAction
+		ctx: StateContext<BudgetStateModel>
 	) {
-		console.log(GetBudgetAction.type);
+		try {
+			this.loader.open();
+
+			const res = await this.api.getBudget()
+				.toPromise();
+
+			this.loader.close();
+
+			return ctx.dispatch(new GetBudgetSuccessAction(res.data));
+		} catch (e) {
+			return ctx.dispatch(new GetBudgetFailureAction());
+		}
 	}
 
 	@Action(GetBudgetSuccessAction)
 	public getBudgetSuccessAction(
 		ctx: StateContext<BudgetStateModel>,
-		action: GetBudgetSuccessAction
+		{ payload }: GetBudgetSuccessAction
 	) {
-		console.log(GetBudgetSuccessAction.type);
-	}
-
-	@Action(GetBudgetFailureAction)
-	public getBudgetFailureAction(
-		ctx: StateContext<BudgetStateModel>,
-		action: GetBudgetFailureAction
-	) {
-		console.log(GetBudgetFailureAction.type);
+		produce(ctx, (draft: BudgetStateModel) => {
+			draft.operations = payload.operations;
+			draft.debit = payload.debit;
+		});
 	}
 
 	@Action(AddOperationAction)
 	public async addOperationAction(
 		ctx: StateContext<BudgetStateModel>,
-		action: AddOperationAction
+		{ payload }: AddOperationAction
 	) {
-		console.log(AddOperationAction.type);
+		try {
+			this.loader.open();
+
+			const res = await this.api.addOperation(payload)
+				.toPromise();
+
+			this.loader.close();
+
+			return ctx.dispatch(new AddOperationSuccessAction(res.data));
+		} catch (e) {
+			return ctx.dispatch(new AddOperationFailureAction());
+		}
 	}
 
 	@Action(AddOperationSuccessAction)
 	public addOperationSuccessAction(
 		ctx: StateContext<BudgetStateModel>,
-		action: AddOperationSuccessAction
+		{ payload }: AddOperationSuccessAction
 	) {
-		console.log(AddOperationSuccessAction.type);
-	}
-
-	@Action(AddOperationFailureAction)
-	public addOperationFailureAction(
-		ctx: StateContext<BudgetStateModel>,
-		action: AddOperationFailureAction
-	) {
-		console.log(AddOperationFailureAction.type);
+		produce(ctx, (draft: BudgetStateModel) => {
+			draft.operations.push(payload);
+			draft.debit += payload.value;
+		});
 	}
 
 	@Action(EditOperationAction)
 	public async editOperationAction(
 		ctx: StateContext<BudgetStateModel>,
-		action: EditOperationAction
+		{ payload }: EditOperationAction
 	) {
-		console.log(EditOperationAction.type);
+		try {
+			this.loader.open();
+
+			const res = await this.api.editOperation(payload.operation)
+				.toPromise();
+
+			this.loader.close();
+
+			return ctx.dispatch(new EditOperationSuccessAction(payload));
+		} catch (e) {
+			return ctx.dispatch(new EditOperationFailureAction());
+		}
 	}
 
 	@Action(EditOperationSuccessAction)
 	public editOperationSuccessAction(
 		ctx: StateContext<BudgetStateModel>,
-		action: EditOperationSuccessAction
+		{ payload }: EditOperationSuccessAction
 	) {
-		console.log(EditOperationSuccessAction.type);
-	}
+		produce(ctx, (draft: BudgetStateModel) => {
+			const index = draft.operations.findIndex(operation => operation.id === payload.operation.id);
 
-	@Action(EditOperationFailureAction)
-	public editOperationFailureAction(
-		ctx: StateContext<BudgetStateModel>,
-		action: EditOperationFailureAction
-	) {
-		console.log(EditOperationFailureAction.type);
+			draft.operations[index] = payload.operation;
+
+			draft.debit = draft.debit - payload.oldValue + payload.operation.value;
+		});
 	}
 
 	@Action(RemoveOperationAction)
 	public async removeOperationAction(
 		ctx: StateContext<BudgetStateModel>,
-		action: RemoveOperationAction
+		{ payload }: RemoveOperationAction
 	) {
-		console.log(RemoveOperationAction.type);
+		try {
+			this.loader.open();
+
+			const res = await this.api.removeOperation(payload)
+				.toPromise();
+
+			this.loader.close();
+
+			return ctx.dispatch(new RemoveOperationSuccessAction(payload));
+		} catch (e) {
+			return ctx.dispatch(new RemoveOperationFailureAction());
+		}
 	}
 
 	@Action(RemoveOperationSuccessAction)
 	public removeOperationSuccessAction(
 		ctx: StateContext<BudgetStateModel>,
-		action: RemoveOperationSuccessAction
+		{ payload }: RemoveOperationSuccessAction
 	) {
-		console.log(RemoveOperationSuccessAction.type);
-	}
-
-	@Action(RemoveOperationFailureAction)
-	public removeOperationFailureAction(
-		ctx: StateContext<BudgetStateModel>,
-		action: RemoveOperationFailureAction
-	) {
-		console.log(RemoveOperationFailureAction.type);
+		produce(ctx, (draft: BudgetStateModel) => {
+			draft.operations = draft.operations.filter(operation => operation.id !== payload.id);
+			draft.debit -= payload.value;
+		});
 	}
 
 	@Action(ReduceDebitAction)
 	public reduceDebitAction(
 		ctx: StateContext<BudgetStateModel>,
-		action: ReduceDebitAction
+		{ payload }: ReduceDebitAction
 	) {
-		console.log(ReduceDebitAction.type);
+		produce(ctx, (draft: BudgetStateModel) => {
+			draft.debit -= payload.value;
+		});
+	}
+
+	@Action([
+		GetBudgetFailureAction,
+		AddOperationFailureAction,
+		EditOperationFailureAction,
+		RemoveOperationFailureAction
+	])
+	public failure() {
+		this.loader.close();
+		this.error.occurs();
 	}
 }
