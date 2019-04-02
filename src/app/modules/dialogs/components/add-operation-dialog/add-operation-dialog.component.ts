@@ -1,12 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Store } from '@ngrx/store';
-import { AppState } from '../../../../store/state/app.state';
-import { AddOperationAction } from '../../../../store/actions/budget.actions';
 import { MatDialogRef } from '@angular/material';
 import { guid } from '../../../shared/utils/guid-util';
 import { Operation } from '../../../../types/operation';
 import * as moment from 'moment';
+import { Store } from '@ngxs/store';
+import { AddOperationAction } from '../../../../store/budget/budget.actions';
 
 @Component({
 	selector: 'app-add-operation-dialog',
@@ -19,7 +18,7 @@ export class AddOperationDialogComponent implements OnInit {
 	constructor(
 		private fb: FormBuilder,
 		private dialogRef: MatDialogRef<AddOperationDialogComponent>,
-		private store: Store<AppState>
+		private store: Store
 	) {
 		this.form = this.prepareForm();
 	}

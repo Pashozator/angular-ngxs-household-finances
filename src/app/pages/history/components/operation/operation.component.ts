@@ -1,10 +1,9 @@
 import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
 import { Operation } from '../../../../types/operation';
-import { Store } from '@ngrx/store';
-import { AppState } from '../../../../store/state/app.state';
-import { RemoveOperationAction } from '../../../../store/actions/budget.actions';
 import { MatDialog } from '@angular/material';
 import { EditOperationDialogComponent } from '../../../../modules/dialogs/components/edit-operation-dialog/edit-operation-dialog.component';
+import { Store } from '@ngxs/store';
+import { RemoveOperationAction } from '../../../../store/budget/budget.actions';
 
 @Component({
 	selector: 'app-operation',
@@ -14,21 +13,15 @@ import { EditOperationDialogComponent } from '../../../../modules/dialogs/compon
 })
 export class OperationComponent implements OnInit {
 	@Input() operation: Operation;
-	public expanded: boolean;
 
 	constructor(
 		private dialog: MatDialog,
-		private store: Store<AppState>
+		private store: Store
 	) {
 		this.operation = new Operation();
-		this.expanded = false;
 	}
 
 	ngOnInit() {
-	}
-
-	public expand(): void {
-		this.expanded = !this.expanded;
 	}
 
 	public edit(): void {

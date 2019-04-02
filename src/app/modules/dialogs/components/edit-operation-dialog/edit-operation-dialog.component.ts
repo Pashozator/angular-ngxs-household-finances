@@ -1,11 +1,10 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
-import { Store } from '@ngrx/store';
-import { AppState } from '../../../../store/state/app.state';
-import { EditOperationAction } from '../../../../store/actions/budget.actions';
 import { Operation } from '../../../../types/operation';
 import * as moment from 'moment';
+import { Store } from '@ngxs/store';
+import { EditOperationAction } from '../../../../store/budget/budget.actions';
 
 @Component({
 	selector: 'app-edit-operation-dialog',
@@ -19,7 +18,7 @@ export class EditOperationDialogComponent implements OnInit {
 		@Inject(MAT_DIALOG_DATA) private operation: Operation,
 		private fb: FormBuilder,
 		private dialogRef: MatDialogRef<EditOperationDialogComponent>,
-		private store: Store<AppState>
+		private store: Store
 	) {
 		this.form = this.prepareForm(operation);
 	}

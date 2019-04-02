@@ -1,10 +1,9 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
-import { Store } from '@ngrx/store';
-import { AppState } from '../../../../store/state/app.state';
-import { EditGoalAction } from '../../../../store/actions/goals.actions';
 import { Goal } from '../../../../types/goal';
+import { Store } from '@ngxs/store';
+import { EditGoalAction } from '../../../../store/goals/goals.actions';
 
 @Component({
 	selector: 'app-edit-goal-dialog',
@@ -18,7 +17,7 @@ export class EditGoalDialogComponent implements OnInit {
 		@Inject(MAT_DIALOG_DATA) private goal: Goal,
 		private fb: FormBuilder,
 		private dialogRef: MatDialogRef<EditGoalDialogComponent>,
-		private store: Store<AppState>
+		private store: Store
 	) {
 		this.form = this.prepareForm(goal);
 	}

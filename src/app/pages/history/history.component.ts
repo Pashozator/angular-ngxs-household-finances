@@ -1,10 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Operation } from '../../types/operation';
-import { select, Store } from '@ngrx/store';
-import { AppState } from '../../store/state/app.state';
-import { GetBudgetAction } from '../../store/actions/budget.actions';
-import { selectDebit, selectOperations } from '../../store/selectors/budget.selectors';
+import { Select, Store } from '@ngxs/store';
+import { BudgetState } from '../../store/budget/budget.state';
+import { GetBudgetAction } from '../../store/budget/budget.actions';
 
 @Component({
 	selector: 'app-history',
@@ -12,12 +11,13 @@ import { selectDebit, selectOperations } from '../../store/selectors/budget.sele
 	styleUrls: ['./history.component.scss']
 })
 export class HistoryComponent implements OnInit {
+	@Select(BudgetState.getOperations)
 	public operations$: Observable<Operation[]>;
+
+	@Select(BudgetState.getDebit)
 	public debit$: Observable<number>;
 
-	constructor(private store: Store<AppState>) {
-		this.operations$ = store.pipe(select(selectOperations));
-		this.debit$ = store.pipe(select(selectDebit));
+	constructor(private store: Store) {
 	}
 
 	ngOnInit() {

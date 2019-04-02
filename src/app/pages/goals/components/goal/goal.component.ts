@@ -1,10 +1,9 @@
 import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
 import { Goal } from '../../../../types/goal';
-import { Store } from '@ngrx/store';
-import { AppState } from '../../../../store/state/app.state';
-import { RealizeGoalAction, RemoveGoalAction } from '../../../../store/actions/goals.actions';
 import { MatDialog } from '@angular/material';
 import { EditGoalDialogComponent } from '../../../../modules/dialogs/components/edit-goal-dialog/edit-goal-dialog.component';
+import { Store } from '@ngxs/store';
+import { RealizeGoalAction, RemoveGoalAction } from '../../../../store/goals/goals.actions';
 
 @Component({
 	selector: 'app-goal',
@@ -17,7 +16,7 @@ export class GoalComponent implements OnInit {
 	@Input() debit: number;
 
 	constructor(
-		private store: Store<AppState>,
+		private store: Store,
 		private dialog: MatDialog
 	) {
 		this.goal = new Goal();
