@@ -1,18 +1,46 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 
-import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+import { AppRoutingModule } from './app-routing/app-routing.module';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { SharedModule } from './modules/shared/shared.module';
+import { DialogsModule } from './modules/dialogs/dialogs.module';
+import { MaterialModule } from './modules/material/material.module';
+import { CoreModule } from './modules/core/core.module';
+import { ErrorModule } from './modules/error/error.module';
+import { LoaderModule } from './modules/loader/loader.module';
+import { NgxsModule } from '@ngxs/store';
+import { NgxsReduxDevtoolsPluginModule } from '@ngxs/devtools-plugin';
+import { environment } from '../environments/environment';
+import { BudgetState } from './store/budget/budget.state';
+import { GoalsState } from './store/goals/goals.state';
 
 @NgModule({
-  declarations: [
-    AppComponent
-  ],
-  imports: [
-    BrowserModule,
-    AppRoutingModule
-  ],
-  providers: [],
-  bootstrap: [AppComponent]
+	declarations: [
+		AppComponent
+	],
+	imports: [
+		BrowserModule,
+		BrowserAnimationsModule,
+		SharedModule,
+		DialogsModule,
+		AppRoutingModule,
+		MaterialModule,
+		CoreModule,
+		ErrorModule,
+		LoaderModule,
+		NgxsModule.forRoot([
+			BudgetState,
+			GoalsState
+		]),
+		NgxsReduxDevtoolsPluginModule.forRoot({
+			name: 'HouseholdFinances',
+			disabled: environment.production
+		})
+	],
+	providers: [],
+	bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class AppModule {
+}
